@@ -1,8 +1,6 @@
-# Kirby WebP Plugin for Kirby 3
+# WebP Plugin for Kirby 3
 
-A snippet and Kirby tag for using WebP images in templates and within textareas.
-
-Currently requires that upload both a jpg|png with a matching webp version. The file names must be identical.
+A snippet and Kirby tag for using WebP images in templates and within textareas. Plugin will convert uploaded files to WebP on the server. This requires having the appropriate extensions installed for IM, GD or whatever you are using. Plugin was tested with GD & [cwebp](https://developers.google.com/speed/webp/docs/cwebp)
 
 ## Installation
 
@@ -57,10 +55,25 @@ snippet('webp', ['sizes' => [1920, 1140, 640, 320], 'src' => 'yourimage.webp', '
 
 If you want to modify the output of the snippet, you can copy it from the plugin into the usual snippet folder and it will get over ridden with your customised version. This is useful if you want to use `focusCrop` plugin rather then the built in `resize()`.
 
+## Options
+
+// Tag Options
+'hashandsalt.kirby-webp.range' => [1920, 1140, 640, 320], // Default range of image sizes
+
+// Convert Options
+'hashandsalt.kirby-webp.template' => 'images', // file blueprint for converted files
+'hashandsalt.kirby-webp.meta' => true,  // all|none|exif|icc|xmp
+
+'hashandsalt.kirby-webp.png.encoding' => 'auto', // auto|lossy|lossless
+'hashandsalt.kirby-webp.png.quality'  => 85, // 1 - 100
+
+'hashandsalt.kirby-webp.jpeg.encoding' => 'auto', // auto|1 - 100
+'hashandsalt.kirby-webp.jpeg.quality'  => 85, // 1 - 100
+
 ## Roadmap
 
 The following features will be implemented over time:
 
 * Field Method.
 * File Method.
-* Convert source image to WebP on the server.
+* ~~Convert source image to WebP on the server~~.

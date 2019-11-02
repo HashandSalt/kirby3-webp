@@ -8,7 +8,8 @@
     "email": "hello@hashandsalt.com"
   }],
   "require": {
-    "getkirby/composer-installer": "^1.1"
+    "getkirby/composer-installer": "^1.1",
+    "rosell-dk/webp-convert": "^2.3"
   },
   "config": {
     "optimize-autoloader": true
