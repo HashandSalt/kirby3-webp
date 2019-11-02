@@ -57,6 +57,7 @@ If you want to modify the output of the snippet, you can copy it from the plugin
 
 ## Options
 
+```
 // Tag Options
 'hashandsalt.kirby-webp.range' => [1920, 1140, 640, 320], // Default range of image sizes
 
@@ -69,6 +70,7 @@ If you want to modify the output of the snippet, you can copy it from the plugin
 
 'hashandsalt.kirby-webp.jpeg.encoding' => 'auto', // auto|1 - 100
 'hashandsalt.kirby-webp.jpeg.quality'  => 85, // 1 - 100
+```
 
 ## Roadmap
 
