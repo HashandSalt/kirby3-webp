@@ -1,24 +1,33 @@
 <?php
-  $fb = $type;
-  $fbtype = 'type="image/'.$type.'"';
-  $img = $src;
-  $fallbackimg = $img->parent()->file(str_replace($img->extension(), $fb, $img->filename()));
-  $range = $sizes;
+$webp = $src->toWebp();
+$variants = $src->toVariants()->filterBy('extension', '!=', 'webp');
+$source = $src->toSource();
 ?>
 
-<picture class="<?= $class ?>">
+<picture<?=e($class, attr(['class' => $class], ' '))?>>
 
-  <?php foreach($range as $max): ?>
-    <source media="(min-width: <?= $max ?>px)" type="image/webp" srcset="<?= $img->resize($max)->url() ?>" alt="<?= $img->alt() ?>"  />
-  <?php endforeach ?>
+    <?php foreach ($sizes as $max): ?>
+        <source
+            media="(min-width: <?=$max?>px)"
+            type="image/webp"
+            srcset="<?=$webp->resize($max)->url()?>"
+            alt="<?=$webp->alt()?>"
+        />
+    <?php endforeach?>
 
-  <?php foreach($range as $max): ?>
-    <source media="(min-width: <?= $max ?>px)" <?= $fbtype ?> srcset="<?= $fallbackimg->resize($max)->url() ?>" alt="<?= $fallbackimg->alt() ?>"  />
-  <?php endforeach ?>
+    <?php foreach ($variants as $variant): ?>
+        <?php foreach ($sizes as $max): ?>
+            <source
+                media="(min-width: <?=$max?>px)"
+                type="image/<?=$variant->extension()?>"
+                srcset="<?=$variant->resize($max)->url()?>"
+                alt="<?=$variant->alt()?>"
+            />
+        <?php endforeach?>
+    <?php endforeach?>
 
-  <img
-  src="<?= $fallbackimg->resize($width, $height)->url() ?>"
-  alt="<?= $fallbackimg->alt() ?>"
-  >
-
+    <img
+        src="<?=$source->resize($width, $height)->url()?>"
+        alt="<?=$source->alt()?>"
+    />
 </picture>
