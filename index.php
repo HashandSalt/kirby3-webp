@@ -4,7 +4,7 @@
  *
  * WebP Plugin for Kirby 3
  *
- * @version   0.0.2
+ * @version   0.0.3
  * @author    James Steel <https://hashandsalt.com>
  * @copyright James Steel <https://hashandsalt.com>
  * @link      https://github.com/HashandSalt/webp
@@ -40,16 +40,94 @@ Kirby::plugin('hashandsalt/kirby-webp', [
 
     // Methods
     'fileMethods' => [
-        'webp' => function () {
-          // TODO: make file method!
+        'generateWebp' => function () {
+            try {
+                // Checking file type since only images are processed
+                if ($this->type() == 'image') {
+                    // WebP Convert
+                    $input = $this->root();
+                    $original = $this->filename();
+                    $fname = F::name($original) . '.webp';
+                    $output = str_replace($original, $fname, $input);
+
+                    // WebP Convert options
+                    $options = [
+                        'png' => [
+                            'encoding' => option('hashandsalt.kirby-webp.png.encoding'),
+                            'quality' => option('hashandsalt.kirby-webp.png.quality')
+                        ],
+                        'jpeg' => [
+                            'encoding' => option('hashandsalt.kirby-webp.jpeg.encoding'),
+                            'quality' => option('hashandsalt.kirby-webp.jpeg.quality')
+
+                        ]
+                    ];
+
+                    // Generating WebP image & placing it alongside the original version
+                    Stack::convert($input, $output, $options);
+
+                    // Create Meta for the WebP File
+                    $file = File::factory([
+                        'source' => $output,
+                        'parent' => $this->parent(),
+                        'filename' => $fname,
+                        'template' => option('hashandsalt.kirby-webp.template')
+                    ]);
+
+                    return $file->save();
+                }
+            } catch (Exception $e) {
+                return $e->getMessage();
+            }
+        },
+        'toType' => function ($type = 'webp', $filename = false) {
+            $pattern = '/\.[a-z]*$/';
+
+            if ($filename) {
+                return preg_replace($pattern, '.' . $type, $this->filename());
+            }
+
+            return preg_replace($pattern, '.' . $type, $this->id());
+        },
+        'toWebp' => function () {
+            if (!$this) {
+                return null;
+            }
+
+            if ($webp = $this->files()->findByKey($this->toType('webp', true))) {
+                return $webp;
+            } else {
+                return $this->generateWebp();
+            }
+        },
+        'toSource' => function () {
+            if ($files = $this->toVariants()->filterBy('extension', '!=', 'webp')) {
+                return $files->first();
+            } else {
+                return null;
+            }
+        },
+        'toVariants' => function () {
+            $pathinfo = pathinfo($this->root());
+            $filename = $pathinfo['filename'];
+
+            return $this->files()->filterBy('type', '==', 'image')->filter(function ($file) use ($filename) {
+                $pathinfo = pathinfo($file->root());
+
+                return $pathinfo['filename'] === $filename;
+            });
+        },
+        'hasWebp' => function () {
+            return $this->files()->find($this->toType('webp', true)) ? true : false;
+        },
+        'isWebp' => function () {
+            $pathinfo = pathinfo($this->root());
+
+            return $pathinfo['extension'] === 'webp';
         }
     ],
 
-    'fieldMethods' => [
-        'webp' => function () {
-          // TODO: make field method!
-        }
-    ],
+
 
     // Hooks
     'hooks' => [
