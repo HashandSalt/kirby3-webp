@@ -4,7 +4,7 @@
  *
  * WebP Plugin for Kirby 3
  *
- * @version   0.0.1
+ * @version   0.0.2
  * @author    James Steel <https://hashandsalt.com>
  * @copyright James Steel <https://hashandsalt.com>
  * @link      https://github.com/HashandSalt/webp
@@ -12,6 +12,7 @@
  */
 
 @include_once __DIR__ . '/vendor/autoload.php';
+@include_once __DIR__ . '/src/webp-convert.php';
 
 Kirby::plugin('hashandsalt/kirby-webp', [
 
@@ -21,7 +22,20 @@ Kirby::plugin('hashandsalt/kirby-webp', [
 
     // Options
     'options' => [
-      'range' => [1920, 1140, 640, 320],
+
+      // Tag Options
+      'range' => [1920, 1140, 640, 320], // Default range of image sizes
+
+      // Convert Options
+      'template' => 'images', // file blueprint for converted files
+      'meta' => true,  // all|none|exif|icc|xmp
+
+      'png.encoding' => 'auto', // auto|lossy|lossless
+      'png.quality'  => 85, // 1 - 100
+
+      'jpeg.encoding' => 'auto', // auto|1 - 100
+      'jpeg.quality'  => 85, // 1 - 100
+
     ],
 
     // Methods
@@ -37,6 +51,17 @@ Kirby::plugin('hashandsalt/kirby-webp', [
         }
     ],
 
+    // Hooks
+    'hooks' => [
+        'file.create:after' => function ($file) {
+            (new Kirby\Plugins\WebP\Convert)->generateWebP($file);
+        },
+
+        'file.replace:after' => function ($newFile, $oldFile) {
+            (new Kirby\Plugins\WebP\Convert)->generateWebP($newFile);
+        },
+
+    ],
 
     // Tags
     'tags' => [
