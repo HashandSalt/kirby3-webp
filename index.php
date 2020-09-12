@@ -11,8 +11,16 @@
  * @license   MIT <http://opensource.org/licenses/MIT>
  */
 
+
 @include_once __DIR__ . '/vendor/autoload.php';
+
+
+use WebPConvert\WebPConvert;
+use WebPConvert\Convert\Converters\Stack;
+
+
 @include_once __DIR__ . '/src/webp-convert.php';
+
 
 Kirby::plugin('hashandsalt/kirby-webp', [
 
@@ -40,15 +48,16 @@ Kirby::plugin('hashandsalt/kirby-webp', [
 
     // Methods
     'fileMethods' => [
+
         'generateWebp' => function () {
             try {
                 // Checking file type since only images are processed
-                if ($this->type() == 'image') {
+                if ($file->type() == 'image') {
                     // WebP Convert
-                    $input = $this->root();
-                    $original = $this->filename();
-                    $fname = F::name($original) . '.webp';
-                    $output = str_replace($original, $fname, $input);
+                    Dir::make(dirname($file->mediaRoot()));
+
+                    $input = $file->root();
+                    $output = preg_replace('/\.[a-z]*$/', '.webp', $file->mediaRoot());
 
                     // WebP Convert options
                     $options = [
@@ -63,83 +72,21 @@ Kirby::plugin('hashandsalt/kirby-webp', [
                         ]
                     ];
 
-                    // Generating WebP image & placing it alongside the original version
-                    Stack::convert($input, $output, $options);
-
-                    // Create Meta for the WebP File
-                    $file = File::factory([
-                        'source' => $output,
-                        'parent' => $this->parent(),
-                        'filename' => $fname,
-                        'template' => option('hashandsalt.kirby-webp.template')
-                    ]);
-
-                    return $file->save();
+                    return Stack::convert($input, $output, $options);
                 }
             } catch (Exception $e) {
                 return $e->getMessage();
             }
         },
-        'toType' => function ($type = 'webp', $filename = false) {
-            $pattern = '/\.[a-z]*$/';
 
-            if ($filename) {
-                return preg_replace($pattern, '.' . $type, $this->filename());
-            }
+        'webp' => function () {
+          $webp = $this->generateWebp();
+          return preg_replace('/\.[a-z]*$/', '.webp', $this->mediaUrl());
 
-            return preg_replace($pattern, '.' . $type, $this->id());
-        },
-        'toWebp' => function () {
-            if (!$this) {
-                return null;
-            }
-
-            if ($webp = $this->files()->findByKey($this->toType('webp', true))) {
-                return $webp;
-            } else {
-                return $this->generateWebp();
-            }
-        },
-        'toSource' => function () {
-            if ($files = $this->toVariants()->filterBy('extension', '!=', 'webp')) {
-                return $files->first();
-            } else {
-                return null;
-            }
-        },
-        'toVariants' => function () {
-            $pathinfo = pathinfo($this->root());
-            $filename = $pathinfo['filename'];
-
-            return $this->files()->filterBy('type', '==', 'image')->filter(function ($file) use ($filename) {
-                $pathinfo = pathinfo($file->root());
-
-                return $pathinfo['filename'] === $filename;
-            });
-        },
-        'hasWebp' => function () {
-            return $this->files()->find($this->toType('webp', true)) ? true : false;
-        },
-        'isWebp' => function () {
-            $pathinfo = pathinfo($this->root());
-
-            return $pathinfo['extension'] === 'webp';
         }
     ],
 
 
-
-    // Hooks
-    'hooks' => [
-        'file.create:after' => function ($file) {
-            (new Kirby\Plugins\WebP\Convert)->generateWebP($file);
-        },
-
-        'file.replace:after' => function ($newFile, $oldFile) {
-            (new Kirby\Plugins\WebP\Convert)->generateWebP($newFile);
-        },
-
-    ],
 
     // Tags
     'tags' => [

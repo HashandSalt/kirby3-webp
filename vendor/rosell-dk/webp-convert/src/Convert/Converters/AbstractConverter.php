@@ -106,7 +106,7 @@ abstract class AbstractConverter
      * @param   array   $options (optional)  options for conversion
      * @param   BaseLogger $logger (optional)
      */
-    public function __construct($source, $destination, $options = [], $logger = null)
+    final public function __construct($source, $destination, $options = [], $logger = null)
     {
         InputValidator::checkSourceAndDestination($source, $destination);
 
@@ -117,7 +117,7 @@ abstract class AbstractConverter
         $this->setProvidedOptions($options);
 
         if (!isset($this->options['_skip_input_check'])) {
-            $this->log('WebP Convert 2.3.0', 'italic');
+            $this->log('WebP Convert 2.3.2', 'italic');
             $this->logLn(' ignited.');
             $this->logLn('- PHP version: ' . phpversion());
             if (isset($_SERVER['SERVER_SOFTWARE'])) {
@@ -152,7 +152,7 @@ abstract class AbstractConverter
      * Set destination.
      *
      * @param   string  $destination         path to destination
-     * @return string  The destination.
+     * @return  void
      */
     public function setDestination($destination)
     {
@@ -199,7 +199,6 @@ abstract class AbstractConverter
      */
     public static function createInstance($source, $destination, $options = [], $logger = null)
     {
-
         return new static($source, $destination, $options, $logger);
     }
 
@@ -207,11 +206,11 @@ abstract class AbstractConverter
     {
         $sourceSize = filesize($source);
         $destSize = filesize($destination);
-        $this->log(round(($sourceSize - $destSize)/$sourceSize * 100) . '% ');
+        $this->log(round(($sourceSize - $destSize) / $sourceSize * 100) . '% ');
         if ($sourceSize < 10000) {
-            $this->logLn('(went from ' . strval($sourceSize) . ' bytes to '. strval($destSize) . ' bytes)');
+            $this->logLn('(went from ' . strval($sourceSize) . ' bytes to ' . strval($destSize) . ' bytes)');
         } else {
-            $this->logLn('(went from ' . round($sourceSize/1024) . ' kb to ' . round($destSize/1024) . ' kb)');
+            $this->logLn('(went from ' . round($sourceSize / 1024) . ' kb to ' . round($destSize / 1024) . ' kb)');
         }
     }
 
