@@ -4,7 +4,7 @@
  *
  * WebP Plugin for Kirby 3
  *
- * @version   0.0.3
+ * @version   0.0.5
  * @author    James Steel <https://hashandsalt.com>
  * @copyright James Steel <https://hashandsalt.com>
  * @link      https://github.com/HashandSalt/webp
@@ -12,13 +12,9 @@
  */
 
 
-@include_once __DIR__ . '/vendor/autoload.php';
-
-
-use WebPConvert\WebPConvert;
 use WebPConvert\Convert\Converters\Stack;
 
-
+@include_once __DIR__ . '/vendor/autoload.php';
 @include_once __DIR__ . '/src/webp-convert.php';
 
 
